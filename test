@@ -1,0 +1,50 @@
+package basics;
+
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.List;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.firefox.FirefoxDriver;
+
+public class Test2 {
+	public static void main(String[] args) throws InterruptedException {
+		WebElement selectedItem = null;
+		System.setProperty("webdriver.gecko.driver",
+				"C:\\Users\\Sarayu\\Downloads\\geckodriver-v0.18.0-win64\\geckodriver.exe");
+		WebDriver driver = new FirefoxDriver();
+		driver.get("https://www.amazon.com");
+		driver.findElement(By.id("twotabsearchtextbox")).sendKeys("laptops");
+		driver.findElement(By.xpath("//input[@type='submit']")).click();
+		By rates = By.cssSelector("span[class='sx-price-whole']");	
+		List<WebElement> prices = driver.findElements(rates);
+		String itemPrice = prices.get(0).getText();		
+		//System.out.println(prices.size());
+		
+		try {			
+			for (WebElement price : prices) {				
+				String eachItemPrice = price.getText();
+				//System.out.println("each item price $" + eachItemPrice);				
+				if (eachItemPrice.contains(",")) {					
+					String formattedItemPrice = eachItemPrice.replace(",", "");
+					// System.out.println("converted price "+converted);
+					if (Integer.parseInt(formattedItemPrice) > Integer.parseInt(itemPrice)) {
+						itemPrice = formattedItemPrice;
+						selectedItem = price;
+					}
+				} 
+				else if (Integer.parseInt(eachItemPrice) > Integer.parseInt(itemPrice)) {
+					itemPrice = eachItemPrice;
+					selectedItem = price;
+				}
+			}
+		} 	
+		catch (NumberFormatException e) {
+			System.out.println(e.getMessage());
+		}	
+		selectedItem.click();
+		System.out.println("highest item price $" + itemPrice);
+	}
+}
